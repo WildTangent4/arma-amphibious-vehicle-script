@@ -10,6 +10,13 @@ CRCK_fnc_moveForward = {
     };
 }; 
  
+CRCK_fnc_moveForwardFast = {
+    params ["_vehicle"]; 
+    if (speed _vehicle < 25)then{ 
+        _vehicle addForce [_vehicle vectorModelToWorld [0,200*diag_deltaTime,0], [1,0,0]]; 
+    };
+};
+
 CRCK_fnc_steer = { 
     params ["_vehicle","_dir"];//number, either -1 (turns left) or 1 (turns right) 
     _vehicle addTorque (_vehicle vectorModelToWorld [0,0,(150*speed _vehicle*diag_deltaTime*_dir)]); 
@@ -36,6 +43,9 @@ CRCK_fnc_reverse = {
  
 onEachFrame { 
     if (inputAction "CarForward">0)then{ 
+        [_boat] call CRCK_fnc_moveForward; 
+    };
+    if (inputAction "CarFastForward">0)then{ 
         [_boat] call CRCK_fnc_moveForward; 
     };
     if (inputAction "CarBreak">0)then{ 
