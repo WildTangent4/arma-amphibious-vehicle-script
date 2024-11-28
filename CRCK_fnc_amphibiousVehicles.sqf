@@ -25,6 +25,12 @@ CRCK_fnc_break = {
     };
 }; 
 
+CRCK_fnc_reverse = { 
+    params ["_vehicle"]; 
+    if (speed _vehicle > -22)then{ 
+        _vehicle addForce [_vehicle vectorModelToWorld [0,-900*diag_deltaTime,0], [1,0,0]]; 
+    };
+}; 
 
 //[_vehicle,_boat] call BIS_fnc_attachToRelative; 
  
@@ -35,7 +41,9 @@ onEachFrame {
     if (inputAction "CarBreak">0)then{ 
         [_boat] call CRCK_fnc_break; 
     };
-    
+    if (inputAction "CarBack">0)then{ 
+        [_boat] call CRCK_fnc_reverse; 
+    };    
     if (inputAction "CarLeft">0)then{ 
         [_boat, LEFT] call CRCK_fnc_steer; 
     } ;
