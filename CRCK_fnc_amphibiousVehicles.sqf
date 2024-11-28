@@ -12,8 +12,8 @@ CRCK_fnc_moveForward = {
  
 CRCK_fnc_moveForwardFast = {
     params ["_vehicle"]; 
-    if (speed _vehicle < 25)then{ 
-        _vehicle addForce [_vehicle vectorModelToWorld [0,200*diag_deltaTime,0], [1,0,0]]; 
+    if (speed _vehicle < 30)then{ 
+        _vehicle addForce [_vehicle vectorModelToWorld [0,500*diag_deltaTime,0], [1,0,0]]; 
     };
 };
 
