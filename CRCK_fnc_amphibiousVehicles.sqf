@@ -2,8 +2,7 @@ params ["_vehicle", "_boat"]//note "_boat" is a temporary variable for testing a
 
 LEFT = -1; 
 RIGHT = 1; 
- 
- 
+
 CRCK_fnc_moveForward = {
     params ["_vehicle"]; 
     if (speed _vehicle < 25)then{ 
@@ -19,5 +18,13 @@ CRCK_fnc_steer = {
 [_vehicle,_boat] call BIS_fnc_attachToRelative; 
  
 onEachFrame { 
-    
+    if (inputAction "CarForward">0)then{ 
+        [_boat] call CRCK_fnc_moveForward; 
+    };
+    if (inputAction "CarLeft">0)then{ 
+        [_boat, LEFT] call CRCK_fnc_steer; 
+    } ;
+    if (inputAction "CarRight">0)then{ 
+        [_boat, RIGHT] call CRCK_fnc_steer; 
+    }; 
 } 
