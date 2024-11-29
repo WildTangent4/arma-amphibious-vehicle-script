@@ -1,10 +1,20 @@
-params ["_vehicle", "_boat"];
+params ["_vehicle"];
 //function assumes it is executed locally and not on the server itself
 
 LEFT = -1; 
 RIGHT = 1;
 
-vehicle player attachTo [boat];
+CRCK_fnc_summonVirtualBoat = { 
+    _boat = "B_G_Boat_Transport_01_F" createVehicle position vehicle player; 
+    _boat setVectorDirAndUp [vectorDir vehicle player,vectorUp vehicle player];
+
+    _boat setPosATL [getPosATL vehicle player#0,getPosATL vehicle player#1,getPosATL vehicle player#2+0.2];//sometimes create vehicle does not use exact positions 
+    vehicle player attachTo [_boat];
+    //_boat allowDamage false;
+    //hideObject _boat; 
+    
+    _boat 
+};
 
 CRCK_fnc_moveForward = {
     params ["_vehicle"]; 
@@ -34,30 +44,48 @@ CRCK_fnc_reverse = {
         _vehicle addForce [_vehicle vectorModelToWorld [0,-900*diag_deltaTime,0], [0,0,0]]; 
     };
 }; 
-_inWaterLastFrame = surfaceIsWater position player;
+
+inWaterLastFrame = false;//this public variable is bad, but needed to pass data into the onEachFrame
+spawnedBoat = player;
 onEachFrame { 
-    
-    _inWater = surfaceIsWater position player;
+    if (vehicle player != player && driver vehicle player == player)then{
+        _engineHp = vehicle player getHit "motor"; 
+        _inWater = (getPosASLW vehicle player)#2<-0.3;// && (!isTouchingGround spawnedBoat || spawnedBoat==player); //waterDamaged vehicle player;
+        vehicle player setHit ["motor", _engineHp];
 
-    if(_inWater==true&&_inWaterLastFrame==false){
+        if(_inWater==true&&inWaterLastFrame==false)then{
+            spawnedBoat = call CRCK_fnc_summonVirtualBoat;
+            systemChat "player entered water";
+        };
+        if(_inWater)then{systemChat "splish splash";
+            if (inputAction "CarForward">0)then{ 
+                [spawnedBoat] call CRCK_fnc_moveForward; 
+            };
+            if (inputAction "CarBreak">0)then{ 
+                [spawnedBoat] call CRCK_fnc_break; 
+            };
+            if (inputAction "CarBack">0)then{ 
+                [spawnedBoat] call CRCK_fnc_reverse; 
+            };    
+            if (inputAction "CarLeft">0)then{ 
+                [spawnedBoat, LEFT] call CRCK_fnc_steer; 
+            } ;
+            if (inputAction "CarRight">0)then{ 
+                [spawnedBoat, RIGHT] call CRCK_fnc_steer; 
+            };
+        }else{
+            systemchat "all dry";
+        };
+        if(_inWater==false&&inWaterLastFrame==true)then{
+            vehicle player allowDamage false;
+            detach vehicle player;
+            deleteVehicle spawnedBoat;
+            spawnedBoat = player;
+            vehicle player setPosATL [(getPosATL vehicle player)#0,(getPosATL vehicle player)#1,(getPosATL vehicle player)#2 + 0.5];
+            vehicle player allowDamage true;
+            systemChat "player left water";
+        };
 
+        inWaterLastFrame = _inWater;
     }
-    if(_inWater){
-        if (inputAction "CarForward">0)then{ 
-            [_boat] call CRCK_fnc_moveForward; 
-        };
-        if (inputAction "CarBreak">0)then{ 
-            [_boat] call CRCK_fnc_break; 
-        };
-        if (inputAction "CarBack">0)then{ 
-            [_boat] call CRCK_fnc_reverse; 
-        };    
-        if (inputAction "CarLeft">0)then{ 
-            [_boat, LEFT] call CRCK_fnc_steer; 
-        } ;
-        if (inputAction "CarRight">0)then{ 
-            [_boat, RIGHT] call CRCK_fnc_steer; 
-        };
-    }
-    _inWaterLastFrame = _inWater;
 }
