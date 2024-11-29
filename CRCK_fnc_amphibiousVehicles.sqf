@@ -23,6 +23,13 @@ CRCK_fnc_moveForward = {
     };
 };
 
+CRCK_fnc_moveForwardFast = {
+    params ["_vehicle"]; 
+    if (speed _vehicle < 35)then{ 
+        _vehicle addForce [_vehicle vectorModelToWorld [0,1300*diag_deltaTime,0], [0,0,0]]; 
+    };
+};
+
 CRCK_fnc_steer = { 
     params ["_vehicle","_dir"];
     _vehicle addTorque (_vehicle vectorModelToWorld [0,0,(500*speed _vehicle*diag_deltaTime*_dir)]); 
@@ -60,6 +67,9 @@ onEachFrame {
         if(_inWater)then{systemChat "splish splash";
             if (inputAction "CarForward">0)then{ 
                 [spawnedBoat] call CRCK_fnc_moveForward; 
+            };
+            if (inputAction "CarFastForward">0)then{ 
+                [spawnedBoat] call CRCK_fnc_moveForwardFast; 
             };
             if (inputAction "CarBreak">0)then{ 
                 [spawnedBoat] call CRCK_fnc_break; 
