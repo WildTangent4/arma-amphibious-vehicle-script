@@ -18,8 +18,8 @@ CRCK_fnc_summonVirtualBoat = {
 
 CRCK_fnc_moveForward = {
     params ["_vehicle"]; 
-    if (speed _vehicle < 25)then{ 
-        _vehicle addForce [_vehicle vectorModelToWorld [0,900*diag_deltaTime,0], [0,0,0]]; 
+    if (speed _vehicle < 30)then{ 
+        _vehicle addForce [_vehicle vectorModelToWorld [0,1200*diag_deltaTime,0], [0,0,0]]; 
     };
 };
 
